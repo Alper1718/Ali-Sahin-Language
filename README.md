@@ -32,41 +32,40 @@ AliSahin is an esoteric programming language designed for educational purposes. 
 
 ### Additional Commands
 
-    unibrow - Increment the value at the current memory pointer by 65.
+    unibrow - Increment the value at the current memory pointer by 65. This is because A is represented with 65.
     nejatjobs - Increment the value at the current memory pointer by 10.
 
 ## Installation
 
   ### Clone the Repository:
 
-'''sh
-git clone https://github.com/yourusername/alisahin.git
-cd alisahin
-'''
+```sh
+git clone https://github.com/Alper1718/Ali-Sahin-Language.git
+```
 
 ### Make the Interpreter Executable:
 
-'''sh
-chmod +x alisahin
-'''
+```sh
+chmod +x alisahin.py
+```
 
 ### Add to PATH (Optional):
 Create a symbolic link in a directory included in your PATH:
 
-'''sh
-    ln -s /path/to/alisahin /usr/local/bin/alisahin
-'''
+```sh
+ln -s /path/to/alisahin.py /usr/local/bin/alisahin
+```
 
 ## Usage
 
 To run an .alisahin file, use the following command:
 
-'''sh
+```sh
 alisahin path/to/yourfile.alisahin
-'''
+```
 
 ## Example
 This line will print ALPER
-'''
+```
 ali unibrow kasistan ali unibrow nejatjobs kas kasistan ali unibrow nejatjobs kas kas kas kas kas kasistan ali unibrow kas kas kas kas kasistan sahin kas kas kasistan
-'''
+```
