@@ -27,7 +27,7 @@ class AliSahinInterpreter:
             elif command == 'kasistan':
                 print(chr(self.memory[self.pointer]), end='')
             elif command == 'alisah':
-                self.memory[self.pointer] = ord(input()[0])
+                self.memory[self.pointer] = (self.memory[self.pointer] + int(input())) % 256
             elif command == 'tekkas':
                 if self.memory[self.pointer] == 0:
                     self.jump_forward()
