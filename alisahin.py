@@ -1,88 +1,91 @@
 #!/usr/bin/env python3
 import argparse
+import re
 
 class AliSahinInterpreter:
     def __init__(self, filename):
-        self.code = self.read_file(filename).split()
-        self.memory = [0] * 30000  
+        self.code = self.read_file(filename)
+        self.memory = [0] * 30000
         self.pointer = 0
-        self.code_pointer = 0
+        self.functions = {}
 
     def read_file(self, filename):
-        """Read the file contents and return as a string."""
+        """Read the file contents and return as a list of lines."""
         try:
             with open(filename, 'r') as file:
-                return file.read()
+                return file.readlines()
         except FileNotFoundError:
             raise Exception(f"Error: File '{filename}' not found.")
         except IOError:
             raise Exception(f"Error: Could not read file '{filename}'.")
 
-    def interpret(self):
-        try:
-            while self.code_pointer < len(self.code):
-                command = self.code[self.code_pointer]
-                if command == 'ali':
-                    self.pointer += 1
-                    if self.pointer >= len(self.memory):
-                        raise Exception("Error: Memory pointer out of bounds (right).")
-                elif command == 'sahin':
-                    self.pointer -= 1
-                    if self.pointer < 0:
-                        raise Exception("Error: Memory pointer out of bounds (left).")
-                elif command == 'kas':
-                    self.memory[self.pointer] = (self.memory[self.pointer] + 1) % 256
-                elif command == 'tek':
-                    self.memory[self.pointer] = (self.memory[self.pointer] - 1) % 256
-                elif command == 'kasistan':
-                    print(chr(self.memory[self.pointer]), end='')
-                elif command == 'alisah':
-                    user_input = input()
-                    self.memory[self.pointer] = (self.memory[self.pointer] + self.validate_input(user_input)) % 256
-                elif command == 'tekkas':
-                    if self.memory[self.pointer] == 0:
-                        self.jump_forward()
-                elif command == 'alisahin':
-                    if self.memory[self.pointer] != 0:
-                        self.jump_backward()
-                elif command == 'unibrow':
-                    self.memory[self.pointer] = (self.memory[self.pointer] + 65) % 256
-                elif command == 'nejatjobs':
-                    self.memory[self.pointer] = (self.memory[self.pointer] + 10) % 256
-                else:
-                    raise Exception(f"Error: Unknown command '{command}'.")
-                self.code_pointer += 1
-        except IndexError:
-            raise Exception("Error: Looping commands are not balanced.")
+    def parse(self):
+        current_function = None
+        for line in self.code:
+            tokens = re.split(r'\s+|\b', line.strip())
+            tokens = [t for t in tokens if t]
+            if not tokens:
+                continue
+            
+            if tokens[0] == "nejatjobs":
+                if len(tokens) < 2 or "{" not in tokens:
+                    raise Exception("Error: 'nejatjobs' must be followed by a function name and '{'.")
+                current_function = tokens[1]
+                self.functions[current_function] = []
+            elif "}" in tokens and current_function:
+                current_function = None
+            elif current_function:
+                self.functions[current_function].extend(tokens)
+            else:
+                self.execute_line(tokens)
 
-    def jump_forward(self):
-        open_brackets = 1
-        while open_brackets > 0:
-            self.code_pointer += 1
-            if self.code_pointer >= len(self.code):
-                raise Exception("Error: 'tekkas' without matching 'alisahin'.")
-            if self.code[self.code_pointer] == 'tekkas':
-                open_brackets += 1
-            elif self.code[self.code_pointer] == 'alisahin':
-                open_brackets -= 1
+    def execute_line(self, tokens):
+        """Execute a single line of commands."""
+        for command in tokens:
+            if command == "ali":
+                self.pointer += 1
+                if self.pointer >= len(self.memory):
+                    raise Exception("Error: Memory pointer out of bounds (right).")
+            elif command == "sahin":
+                self.pointer -= 1
+                if self.pointer < 0:
+                    raise Exception("Error: Memory pointer out of bounds (left).")
+            elif command == "kas":
+                self.memory[self.pointer] = (self.memory[self.pointer] + 1) % 256
+            elif command == "tek":
+                self.memory[self.pointer] = (self.memory[self.pointer] - 1) % 256
+            elif command == "kasistan":
+                print(chr(self.memory[self.pointer]), end='')
+            elif command == "alisah":
+                user_input = input()
+                self.memory[self.pointer] = (self.memory[self.pointer] + self.validate_input(user_input)) % 256
+            elif command == "tekkas":
+                if self.memory[self.pointer] == 0:
+                    return
+            elif command == "alisahin":
+                if self.memory[self.pointer] != 0:
+                    return
+            elif command in self.functions:
+                self.execute_function(command)
+            else:
+                raise Exception(f"Error: Unknown command '{command}'.")
 
-    def jump_backward(self):
-        open_brackets = 1
-        while open_brackets > 0:
-            self.code_pointer -= 1
-            if self.code_pointer < 0:
-                raise Exception("Error: 'alisahin' without matching 'tekkas'.")
-            if self.code[self.code_pointer] == 'tekkas':
-                open_brackets -= 1
-            elif self.code[self.code_pointer] == 'alisahin':
-                open_brackets += 1
+    def execute_function(self, function_name):
+        """Execute a defined function while maintaining pointer position."""
+        if function_name not in self.functions:
+            raise Exception(f"Error: Function '{function_name}' is not defined.")
+        
+        function_commands = self.functions[function_name]
+        self.execute_line(function_commands)
 
     def validate_input(self, user_input):
-        """Validate and convert the user input to an integer."""
         try:
             return int(user_input)
         except ValueError:
             raise Exception("Error: Input must be an integer.")
+
+    def interpret(self):
+        self.parse() 
 
 def main():
     parser = argparse.ArgumentParser(description='Run an .alisahin file with the AliSahinInterpreter.')
