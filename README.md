@@ -9,6 +9,8 @@ AliSahin is an esoteric programming language designed for educational purposes. 
 - **Basic I/O**: Read and print characters.
 - **Looping Constructs**: Conditional loops using `tekkas` and `alisahin`.
 - **Functions**: Define reusable code blocks with `nejatjobs`.
+- **File Importing**: Import functions from other `.alisahin` files with `unibrow`.
+- **Overriding Functions**: Use the `overdrive` keyword to overwrite existing functions.
 
 ## Commands
 
@@ -36,6 +38,14 @@ AliSahin is an esoteric programming language designed for educational purposes. 
 
 - `nejatjobs functionname { ... }` - Define a function with the specified `functionname`. Code inside the curly braces will execute when the function is called.
 - To **call** a function, simply write its name anywhere in the program.
+
+### File Importing
+
+- `unibrow filename` - Import functions from another `.alisahin` file. The filename can include or omit the `.alisahin` extension.
+
+### Overriding Functions
+
+- `overdrive` - Use this keyword before `unibrow` to enable function overriding. This allows imported functions to overwrite existing ones.
 
 ## Installation
 
@@ -66,8 +76,10 @@ To run an `.alisahin` file, use the following command:
 alisahin path/to/yourfile.alisahin
 ```
 
-## Example
+## Examples
+
 ### Example 1: Printing `ALPER`
+
 The following code prints `ALPER`:
 
 ```
@@ -87,4 +99,34 @@ nejatjobs makeA {
 ali makeA kasistan incrementByTen kas kasistan kas kas kas kas kasistan ali makeA kas kas kas kas kasistan sahin kas kas kasistan
 ```
 
----
+### Example 2: Importing and Overriding Functions
+
+Assume we have a file `basicfunctions.alisahin` containing:
+
+```
+nejatjobs incrementByTen {
+    kas kas kas kas kas kas kas kas kas kas
+}
+nejatjobs makeA {
+    incrementByTen
+    incrementByTen
+    incrementByTen
+    incrementByTen
+    incrementByTen
+    incrementByTen
+    kas kas kas kas kas
+}
+
+nejatjobs Alper {
+    ali makeA kasistan incrementByTen kas kasistan kas kas kas kas kasistan ali makeA kas kas kas kas kasistan sahin kas kas kasistan
+}
+```
+
+To import these functions into another `.alisahin` file:
+
+```
+unibrow basicfunctions
+ali Alper
+
+```
+
