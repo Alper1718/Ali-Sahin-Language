@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import re
+import os
 
 class AliSahinInterpreter:
     def __init__(self, filename):
@@ -8,6 +9,8 @@ class AliSahinInterpreter:
         self.memory = [0] * 30000
         self.pointer = 0
         self.functions = {}
+        self.parsed_files = set()
+        self.overdrive_enabled = False
 
     def read_file(self, filename):
         """Read the file contents and return as a list of lines."""
@@ -36,8 +39,37 @@ class AliSahinInterpreter:
                 current_function = None
             elif current_function:
                 self.functions[current_function].extend(tokens)
+            elif tokens[0] == "unibrow":
+                if len(tokens) < 2:
+                    raise Exception("Error: 'unibrow' must be followed by a filename.")
+                self.import_file(tokens[1])
+            elif tokens[0] == "overdrive":
+                self.overdrive_enabled = True
             else:
                 self.execute_line(tokens)
+
+    def import_file(self, filename):
+        """Import functions from another .alisahin file."""
+        if filename in self.parsed_files:
+            return
+
+        if not filename.endswith(".alisahin"):
+            filename += ".alisahin"
+        
+        if not os.path.isfile(filename):
+            raise Exception(f"Error: Imported file '{filename}' not found.")
+
+        imported_code = self.read_file(filename)
+        imported_interpreter = AliSahinInterpreter(filename)
+        imported_interpreter.code = imported_code
+        imported_interpreter.parse()
+
+        for func_name, func_commands in imported_interpreter.functions.items():
+            if func_name in self.functions and not self.overdrive_enabled:
+                raise Exception(f"Error: Function '{func_name}' in '{filename}' conflicts with an existing function.")
+            self.functions[func_name] = func_commands
+        
+        self.parsed_files.add(filename)
 
     def execute_line(self, tokens):
         """Execute a single line of commands."""
@@ -65,6 +97,7 @@ class AliSahinInterpreter:
             elif command == "alisahin":
                 if self.memory[self.pointer] != 0:
                     return
+
             elif command in self.functions:
                 self.execute_function(command)
             else:
