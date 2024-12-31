@@ -26,7 +26,7 @@ class AliSahinInterpreter:
         current_function = None
         for line in self.code:
             line = line.strip()
-            if line.startswith(";"):  # Skip comment lines
+            if line.startswith(";"):
                 continue
             
             tokens = re.split(r'\s+|\b', line)
