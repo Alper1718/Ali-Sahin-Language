@@ -25,7 +25,11 @@ class AliSahinInterpreter:
     def parse(self):
         current_function = None
         for line in self.code:
-            tokens = re.split(r'\s+|\b', line.strip())
+            line = line.strip()
+            if line.startswith(";"):  # Skip comment lines
+                continue
+            
+            tokens = re.split(r'\s+|\b', line)
             tokens = [t for t in tokens if t]
             if not tokens:
                 continue
@@ -47,6 +51,7 @@ class AliSahinInterpreter:
                 self.overdrive_enabled = True
             else:
                 self.execute_line(tokens)
+
 
     def import_file(self, filename):
         """Import functions from another .alisahin file."""
